@@ -1,0 +1,3 @@
+class ClosestWeightliftingGem::Geocoder
+
+end

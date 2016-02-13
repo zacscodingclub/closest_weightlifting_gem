@@ -10,5 +10,10 @@ require "closest_weightlifting_gem"
 # require "pry"
 # Pry.start
 
-require "irb"
-IRB.start
+require 'pry'
+
+def reload!
+  load_all '.././lib'
+end
+
+Pry.start
