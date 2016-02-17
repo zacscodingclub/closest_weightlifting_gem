@@ -2,21 +2,21 @@ class ClosestWeightliftingGem::CLI
   def call
     load_gyms
 
-    address_input
-
     menu
+
+    address_input
   end
 
   def load_gyms
-    puts <<-DOC
+    puts <<-DOC.gsub /^\s*/, ''
       Welcome to the Closest Weightlifting Gem!
-      Give me a second while I fetch fresh data widget doohicky from the cloud nebula...
+      Give me a few minutes to fetch a fresh data widget doohicky from the cloud nebula...
     DOC
-    ClosestWeightliftingGem::Scraper.new.scrape_main
+    ClosestWeightliftingGem::Scraper.scrape_main
   end
 
   def address_input
-    puts <<-DOC
+    puts <<-DOC.gsub /^\s*/, ''
       Please enter your address below and I'll find
       the closest weightlifting gym. (ex. 123 Main St. New York, NY)
     DOC
@@ -24,9 +24,9 @@ class ClosestWeightliftingGem::CLI
   end
 
   def menu
-    puts <<-DOC
-      1. More info about the gym
-      2. Search again?
+    puts <<-DOC.gsub /^\s*/, ''
+      1. Search 
+      2. List By State
       3. Exit
     DOC
 
@@ -39,9 +39,9 @@ class ClosestWeightliftingGem::CLI
       input = gets.strip.downcase
       case input
         when "1"
-          puts "#1"
+          show_gym
         when "2"
-          puts "#2"
+          puts "Enter"
         when "3"
           puts "#3"
         when "exit"

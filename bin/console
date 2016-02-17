@@ -13,7 +13,7 @@ require "closest_weightlifting_gem"
 require 'pry'
 
 def reload!
-  load_all '.././lib'
+  load './lib/closest_weightlifting_gem.rb'
 end
 
 Pry.start
