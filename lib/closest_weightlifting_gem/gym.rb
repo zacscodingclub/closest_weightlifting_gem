@@ -1,5 +1,14 @@
 class ClosestWeightliftingGem::Gym
-  attr_accessor :name, :full_address, :street, :city, :state, :zipcode, :phone, :director, :coach, :website
+  attr_accessor :name,
+                :full_address,
+                :street,
+                :city,
+                :state,
+                :zipcode,
+                :phone,
+                :director,
+                :coach,
+                :website
 
   @@all = []
 
@@ -23,6 +32,6 @@ class ClosestWeightliftingGem::Gym
   end
 
   def self.find_by_state(state)
-    self.all.find_all { |gym| gym.state == state.upcase }
+    @@all.find_all { |gym| gym.state == state.upcase }
   end
 end
