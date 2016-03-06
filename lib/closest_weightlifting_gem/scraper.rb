@@ -1,5 +1,5 @@
 class ClosestWeightliftingGem::Scraper
-  BASE_URL = "https://webpoint.usaweightlifting.org/wp15/Companies"
+  BASE_URL = "https://webpoint.usaweightlifting.org/wp15/Companies/"
 
   def self.scrape_main
     puts "Fetching index..."
@@ -29,7 +29,7 @@ class ClosestWeightliftingGem::Scraper
                 :phone => gym_doc.search(".fe_big_row:nth-child(4) td").children.last.to_s[1..-1],
              :director => gym_doc.search(".fe_big_row:nth-child(2) td+ td").text,
                 :coach => gym_doc.search(".fe_big_row+ .fe_big_row td+ td").text,
-              :website => gym_doc.search(".fe_big_row~ .fe_big_row b").text.split("e:").last[1..-1]
+              :website => gym_doc.text.split("site:")[1].split("\r")[0][1..-1]
       })
     end
   end
