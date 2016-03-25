@@ -8,6 +8,7 @@ class ClosestWeightliftingGem::Gym
                 :phone,
                 :director,
                 :coach,
+                :usaw_url,
                 :website
 
   @@all = []
@@ -15,12 +16,15 @@ class ClosestWeightliftingGem::Gym
   def initialize(gym_attributes)
     gym_attributes.each { |k,v| self.send(("#{k}="), v)}
 
-    @street = full_address.split(",")[0].split(" ")[0..-2].join(" ")
-    @city = full_address.split(",")[0].split(" ").last
-    @state = full_address.split(/\W/)[-3].upcase
-    @zipcode = full_address.split(/\W/).last
-
     @@all << self
+  end
+
+  def add_attributes(gym_attributes)
+    gym_attributes.each { |k,v| self.send(("#{k}="), v)}
+  end
+
+  def full_address
+    "#{street} #{city}, #{state} #{zipcode}"
   end
 
   def self.all
@@ -28,10 +32,26 @@ class ClosestWeightliftingGem::Gym
   end
 
   def self.reset!
-    @@all.clear
+    self.all.clear
+  end
+
+  def self.weird_gyms
+    self.all.find_all do |g| 
+      g.phone == nil || g.street == nil || g.name == nil 
+    end
+  end
+
+  def self.find_by_name(input)
+    select_few = self.all.select do |gym|
+      gym.name.upcase.include?(input.upcase)
+    end
   end
 
   def self.find_by_state(state)
-    @@all.find_all { |gym| gym.state == state.upcase }
+    self.all.find_all { |gym| gym.state == state.upcase }
+  end
+
+  def self.count_by_state
+    self.all.inject(Hash.new(0)) { |total, gym| total[gym.state] += 1 ; total }
   end
 end
