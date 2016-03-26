@@ -4,7 +4,7 @@ This application scrapes the [USA Weightlifting's Find a Club ](http://www.teamu
 
 TODO: 
 1. Implement proper options from CLI#show_gym
-  * show_gym page from #find_by_names menu should take it back to those search results instead of the state results
+..* show_gym page from #find_by_names menu should take it back to those search results instead of the state results
 2. Geocode gym addresses
 3. Implement user location input to find nearest gyms
 
