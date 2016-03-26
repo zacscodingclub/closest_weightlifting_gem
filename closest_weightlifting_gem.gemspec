@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = "USA Weighlifting Club Gyms"
   spec.description   = "This gem uses the data available on the USA Weightlifting website (http://www.teamusa.org/usa-weightlifting/clubs-lwc/find-a-club) to create a simple CLI interface with all the gyms."
-  spec.homepage      = "https://github.com/zacscodingclub/closest_weightlifting_gem"
+  spec.homepage      = "http://rubygems.org/gems/closest_weightlifting_gem"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
