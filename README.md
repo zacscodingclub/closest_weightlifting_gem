@@ -1,6 +1,12 @@
 # ClosestWeightliftingGem
 
-TODO: Delete this and the text above, and describe your gem
+This application scrapes the [USA Weightlifting's Find a Club ](http://www.teamusa.org/usa-weightlifting/clubs-lwc/find-a-club) feature and builds a Gym object for each club, which includes some basic biographical information.
+
+TODO: 
+1. Implement proper options from CLI#show_gym
+  * show_gym page from #find_by_names menu should take it back to those search results instead of the state results
+2. Geocode gym addresses
+3. Implement user location input to find nearest gyms
 
 ## Installation
 
@@ -20,7 +26,7 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+
 
 ## Development
 
