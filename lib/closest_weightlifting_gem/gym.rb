@@ -12,6 +12,7 @@ class ClosestWeightliftingGem::Gym
                 :website
 
   @@all = []
+  @@searches = []
 
   def initialize(gym_attributes)
     gym_attributes.each { |k,v| self.send(("#{k}="), v)}
@@ -31,6 +32,14 @@ class ClosestWeightliftingGem::Gym
     @@all
   end
 
+  def self.last_search
+    @@searches.last
+  end
+
+  def self.searches
+    @@searches
+  end
+
   def self.reset!
     self.all.clear
   end
@@ -42,12 +51,16 @@ class ClosestWeightliftingGem::Gym
   end
 
   def self.find_by_name(input)
+    self.searches << { method: __method__, value: input }
+
     select_few = self.all.select do |gym|
       gym.name.upcase.include?(input.upcase)
     end
   end
 
   def self.find_by_state(state)
+    self.searches << { method: __method__, value: state }
+    
     self.all.find_all { |gym| gym.state == state.upcase }
   end
 

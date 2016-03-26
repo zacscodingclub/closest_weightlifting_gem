@@ -16,4 +16,10 @@ def reload!
   load './lib/closest_weightlifting_gem.rb'
 end
 
+def basic_setup
+  ["FL","IL","NY"].each do |state|
+    ClosestWeightliftingGem::Scraper.scrape_state_page(state)
+  end
+end
+
 Pry.start

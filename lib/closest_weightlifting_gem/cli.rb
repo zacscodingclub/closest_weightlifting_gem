@@ -34,10 +34,10 @@ class ClosestWeightliftingGem::CLI
   def show_gyms(gyms)
     width = 80
     puts line
-    puts "OK, you selected #{gyms.first.state} and there are #{gyms.size} gyms there!\n"
+    puts "OK, your search yielded #{gyms.size} gyms!\n"
     puts "Here's the list: "
     puts line
-    puts "     Gym Name".ljust(width/2)+"City".ljust(width/2 + 6)
+    puts "     Gym Name".ljust(width/2)+"       City"
 
     gyms.each_with_index do |gym, i|
       puts "#{(i+1).to_s.rjust(3)}. #{gym.name.ljust(width/2)}  #{gym.city}, #{gym.state}"
@@ -49,12 +49,11 @@ class ClosestWeightliftingGem::CLI
   def show_gym(gym)
     ClosestWeightliftingGem::Scraper.scrape_attributes(gym) if !gym.coach
 
-    puts gym.name
-    puts gym.full_address
-    puts gym.director
-    puts gym.coach
-    puts gym.website
-
+    puts "Name: #{gym.name}"
+    puts "Address: #{gym.full_address}"
+    puts "Director: #{gym.director}"
+    puts "Coach: #{gym.coach}"
+    puts "Website: #{gym.website}"
 
     options(__method__, gym)
   end
