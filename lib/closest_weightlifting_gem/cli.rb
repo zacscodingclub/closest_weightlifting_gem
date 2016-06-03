@@ -33,10 +33,10 @@ class ClosestWeightliftingGem::CLI
 
   def show_gyms(gyms)
     width = 80
-    puts line
+    puts "="*width
     puts "OK, your search yielded #{gyms.size} gyms!\n"
     puts "Here's the list: "
-    puts line
+    puts "="*width
     puts "     Gym Name".ljust(width/2)+"       City"
 
     gyms.each_with_index do |gym, i|
@@ -45,15 +45,13 @@ class ClosestWeightliftingGem::CLI
 
     options(__method__, gyms)
   end
-  
-  def show_gym(gym)
-    ClosestWeightliftingGem::Scraper.scrape_attributes(gym) if !gym.coach
 
+  def show_gym(gym)
     puts "Name: #{gym.name}"
     puts "Address: #{gym.full_address}"
     puts "Director: #{gym.director}"
     puts "Coach: #{gym.coach}"
-    puts "Website: #{gym.website}"
+    puts "Phone: #{gym.phone}"
 
     options(__method__, gym)
   end
@@ -84,10 +82,9 @@ class ClosestWeightliftingGem::CLI
       when "show_gym"
         puts line
         puts <<-DOC.gsub(/^\s*/,'')
-          1. Open Website
-          2. Back to State Results
-          3. Main menu
-          4. Exit
+          1. Back to State Results
+          2. Main menu
+          3. Exit
         DOC
 
         process_gym(data)
@@ -101,14 +98,14 @@ class ClosestWeightliftingGem::CLI
       puts "Sorry, that gym doesn't have a website. :("
     elsif !gym.website.include?("http")
       system("open", "http://#{gym.website}")
-    else 
+    else
       system("open", "#{gym.website}")
     end
   end
 
   def process_main
     input = nil
-    
+
     while input != "exit"
       input = gets.strip.downcase
 
@@ -123,12 +120,8 @@ class ClosestWeightliftingGem::CLI
           show_gyms(ClosestWeightliftingGem::Gym.find_by_name(search_term))
         when "3"
           good_bye
-
-          exit
         when "exit"
           good_bye
-
-          exit
         else
           puts "I didn't understand that, please try again."
       end
@@ -137,14 +130,14 @@ class ClosestWeightliftingGem::CLI
 
   def process_gyms(gyms)
     input = nil
-    
+
     until input == "exit"
       input = gets.strip.downcase
       case input
         when "1"
           puts "Select a gym by the number:"
           gym_num = gets.chomp.to_i - 1
-          
+
           show_gym(gyms[gym_num])
         when "2"
           show_gyms(gyms)
@@ -152,12 +145,8 @@ class ClosestWeightliftingGem::CLI
           main_menu
         when "4"
           good_bye
-
-          exit
         when "exit"
           good_bye
-
-          exit
         else
           puts "I didn't understand that, please try again."
       end
@@ -166,26 +155,20 @@ class ClosestWeightliftingGem::CLI
 
   def process_gym(gym)
     input = nil
-    
+
     until input == "exit"
       input = gets.strip.downcase
       case input
         when "1"
-          open_in_browser(gym)
-
-          options("show_gym", gym)
-        when "2"
           show_gyms(ClosestWeightliftingGem::Gym.find_by_state(gym.state))
-        when "3"
+        when "2"
           main_menu
+        when "3"
+          good_bye
         when "4"
          good_bye
-
-         exit
         when "exit"
           good_bye
-
-          exit
         else
           puts "I didn't understand that, please try again."
       end
@@ -199,5 +182,7 @@ class ClosestWeightliftingGem::CLI
 
   def good_bye
     puts "Adios friend.  Hope you come back to lift weights again!"
+
+    exit
   end
 end

@@ -45,8 +45,8 @@ class ClosestWeightliftingGem::Gym
   end
 
   def self.weird_gyms
-    self.all.find_all do |g| 
-      g.phone == nil || g.street == nil || g.name == nil 
+    self.all.find_all do |g|
+      g.phone == nil || g.street == nil || g.name == nil
     end
   end
 
@@ -60,7 +60,7 @@ class ClosestWeightliftingGem::Gym
 
   def self.find_by_state(state)
     self.searches << { method: __method__, value: state }
-    
+
     self.all.find_all { |gym| gym.state == state.upcase }
   end
 
