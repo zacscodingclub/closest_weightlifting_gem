@@ -20,19 +20,20 @@ Or install it yourself as:
 
 ## Development
 
-To interact with the command line interface, clone the repo locally and change directories into the new folder.   Then you can run `bundle install` or `bin/setup` from the terminal prompt to install dependencies that aren't already on your system. Then, call the full program by typing `bin/closest-weightlifting-gem` into the prompt.  Note:  It scrapes everything up front so that I can query against the full results.
+To interact with the command line interface, clone the repo locally and change directories into the new folder.   Then you can run `bundle install` or `bin/setup` from the terminal prompt to install dependencies that aren't already on your system. Then, call the full program by typing `bin/closest-weightlifting-gem` into the prompt.  Note:  It scrapes everything up front so that I can query against the entire set of 1168 gyms (as of June 11 2016).
 
 You can also run `bin/console` for an interactive prompt that will allow you to experiment. From within this console, you can call `basic_setup` and it will scrape all the gyms in Florida, Illinois, and New York to add some data into the system.
 
 TODO:
 ---
-* Geocode gym addresses
-* Implement user location input to find nearest gyms
 * DRY up Scraper class
 * Hook up to ActiveRecord
+* Geocode gym addresses
+* Implement user location input to find nearest gyms
 * Map
 
-Done(?):
+Done:
+---
 * Implement proper options from CLI#show_gym
 * show_gym page from #find_by_names menu should take it back to those search results instead of the state results
 
