@@ -30,7 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", "~> 1.11"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.0"
-  spec.add_development_dependency "pry", "~> 0.10.3"
+  spec.add_development_dependency "pry", "~> 0.10.4"
 
   spec.add_dependency "nokogiri", "~> 1.6.7.2"
   spec.add_dependency "require_all", "~> 1.3.3"

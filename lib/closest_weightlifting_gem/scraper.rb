@@ -4,6 +4,8 @@ class ClosestWeightliftingGem::Scraper
 
   def self.scrape_main
     puts "Fetching index..."
+    # !!HTTP Request!!
+    # !!HTTP Request!!
     index = Nokogiri::HTML(open("#{BASE_URL}/Clubs.wp?frm=t"))
 
     get_state_abbreviations(index).each { |state| scrape_state_page(state) }
@@ -13,40 +15,43 @@ class ClosestWeightliftingGem::Scraper
 
   def self.scrape_state_page(state)
     puts "Fetching gym data in #{state}..."
+    # !!HTTP Request!!
+    # !!HTTP Request!!
     state_doc = Nokogiri::HTML(open("#{BASE_URL}/Clubs.wp?frm=t&CompanyState=#{state}"))
 
     # I want it to scrape each state page
     # I want it to insantiate and save gym objects for each gym on the page
     # This will just be basic info and I can set other data in the gym class
 
-    state_doc.search(".datarow").each do |gym_row|
-
-      if gym_row.search(".right+ .left").text.split(" ").size < 5
-        scrape_gym_page(gym_row)
-      else
+    state_doc.search("li").each do |gym_row|
+      # binding.pry
+      # if gym_row.search(".right+ .left").text.split(" ").size < 5
+      #   scrape_gym_page(gym_row)
+      # else
         ClosestWeightliftingGem::Gym.new({
-             :name => gym_row.search("a").first.children.text.titleize,
-           :street => gym_row.children[5].children[0].text,
-             :city => gym_row.children[5].children[2].text.split(",").first,
+             :name => gym_row.search("h3").text,
+           :street => gym_row.search("p").children[0].to_s,
+             :city => gym_row.search("p").children[2].to_s.split(/\W+/)[0],
             :state => state,
-          :zipcode => gym_row.children[5].children[2].text.split(/\W+/).last,
-            :phone => gym_row.children[5].children[4].text,
-         :usaw_url => gym_row.search("a").first.attr("onclick").match(/\/V.+true/)[0]
+          :zipcode => gym_row.search("p").children[2].to_s.split(/\W+/)[-1],
+            :phone => gym_row.search("p").children[4].to_s,
+          :website => gym_row.search("a")[0].attr('href'),
+         :director => gym_row.search("p").children[10].to_s
         })
-      end
+      # end
     end
   end
 
   def self.scrape_gym_page(gym_row)
     gym_doc = Nokogiri::HTML(open("#{BASE_URL + gym_row.search("a").first.attr("onclick").match(/\/V.+true/)[0]}"))
-    
+
     ClosestWeightliftingGem::Gym.new({
-      :name => gym_doc.search(".fe_vbig_row td").text.titleize,
-      :street => gym_doc.search(".fe_vbig_row+ .fe_big_row td").children.to_s.split("<br>")[0],
-      :city => gym_doc.search(".fe_vbig_row+ .fe_big_row td").children.to_s.split("<br>")[1].split(",")[0],
-      :state => gym_doc.search(".fe_vbig_row+ .fe_big_row td").children.to_s.split(",").last.split(/\W+/)[1],
-      :zipcode => gym_doc.search(".fe_vbig_row+ .fe_big_row td").children.to_s.split(/\W/).last,
-      :phone => gym_doc.search(".fe_big_row:nth-child(4) td").children.last.to_s[1..-1],
+      :name => gym_doc.search("h3").text,
+      :street => gym_doc.search("p").children[0].to_s,
+      :city => gym_row.search("p").children[2].to_s.split(/\W+/)[0],
+      :state => gym_row.search("p").children[2].to_s.split(/\W+/)[1],
+      :zipcode => gym_row.search("p").children[2].to_s.split(/\W+/)[-1],
+      :phone => gym_row.search("p").children[4].to_s,
       :director => gym_doc.search(".fe_big_row:nth-child(2) td+ td").text,
       :coach => gym_doc.search(".fe_big_row+ .fe_big_row td+ td").text,
       :website => gym_doc.text.split("site:")[1].split("\r").first[1..-1],
