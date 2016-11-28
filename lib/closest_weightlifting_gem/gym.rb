@@ -1,3 +1,5 @@
+require 'pry'
+
 class ClosestWeightliftingGem::Gym
   attr_accessor :name,
                 :full_address,
@@ -23,7 +25,11 @@ class ClosestWeightliftingGem::Gym
   end
 
   def full_address
-    "#{street} #{city}, #{state} #{zipcode}"
+    if street.nil?
+      nil
+    else
+      "#{street}, #{city}, #{state} #{zipcode}"
+    end
   end
 
   def self.all
@@ -60,6 +66,11 @@ class ClosestWeightliftingGem::Gym
     self.searches << { method: __method__, value: state }
 
     self.all.find_all { |gym| gym.state == state.upcase }
+  end
+
+  def self.find_by_last_search
+    last_search = @@searches.last
+    self.send(last_search[:method], last_search[:value])
   end
 
   def self.count_by_state
