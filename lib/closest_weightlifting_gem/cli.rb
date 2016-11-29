@@ -60,14 +60,14 @@ class ClosestWeightliftingGem::CLI
 
   # Not implemented currently, but plan to introduce when I figure out geocoder
   #
-  # def address_input
-  #   puts <<-DOC.gsub /^\s*/, ''
-  #     Please enter your address below and I'll find
-  #     the closest weightlifting gym. (ex. 123 Main St. New York, NY)
-  #   DOC
+  def address_input
+    puts <<-DOC.gsub /^\s*/, ''
+      Please enter your address below and I'll find
+      the closest weightlifting gym. (ex. 123 Main St. New York, NY)
+    DOC
 
-  #   address = gets.chomp
-  # end
+    address = gets.chomp
+  end
 
   def show_gyms(gyms)
     width = 80
@@ -88,7 +88,6 @@ class ClosestWeightliftingGem::CLI
     puts "Name: #{gym.name}"
     puts "Address: #{gym.full_address}"
     puts "Director: #{gym.director}"
-    puts "Coach: #{gym.coach}"
     puts "Phone: #{gym.phone}"
 
     options(__method__, gym)
