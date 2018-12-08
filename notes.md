@@ -1,11 +1,18 @@
-ToDo:
+# ToDo:
+1. Website redesign has caused the scraping to fail.  
+  * ~~.scrape_main to scrape the correct address~~
+  * Update gem versions!!!
+  * State pages have changed slightly in HTML structure and I need to identify
+    those new element selectors
 
+
+## Legacy Notes:
 Update Gemspec ToDos
 2. Start with project structure
 3. Start with entry point - file run (bin/closest-weightlifting-gem)
 4. Build to CLI interface
 5. Stub out interface
-6. Start makinig things real
+6. Start making things real
 7. Discover objects
 8. Program
 
@@ -33,5 +40,3 @@ open to web page or google maps
 
 Basic URI for accessing each state's individual page
 https://webpoint.usaweightlifting.org/wp15/Companies/Clubs.wp?frm=t&CompanyValue=#{state}
-
-

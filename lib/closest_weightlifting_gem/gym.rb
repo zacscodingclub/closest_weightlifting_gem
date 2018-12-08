@@ -57,9 +57,7 @@ class ClosestWeightliftingGem::Gym
   def self.find_by_name(input)
     self.searches << { method: __method__, value: input }
 
-    select_few = self.all.select do |gym|
-      gym.name.upcase.include?(input.upcase)
-    end
+    self.all.find_all { |gym| gym.name.upcase.include?(input.upcase) }
   end
 
   def self.find_by_state(state)

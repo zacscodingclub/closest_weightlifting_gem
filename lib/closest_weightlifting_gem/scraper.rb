@@ -1,46 +1,61 @@
 require 'pry'
+require 'net/http'
+require 'json'
+require 'uri'
 
 class ClosestWeightliftingGem::Scraper
-
   BASE_URL = "https://webpoint.usaweightlifting.org/wp15/Companies/"
 
   def self.get_state_abbreviations(index)
-    index.search("select").children.collect { |child| child.attr("value") }[2..-1]
+    index.search("select#CompanyState").children[2..-1].collect { |child| child.attr("value") }
   end
 
   def self.scrape_main
     puts "Fetching index..."
-    index = Nokogiri::HTML(open("#{BASE_URL}/Clubs.wp?frm=t"))
+    index = Nokogiri::HTML(open("#{BASE_URL}/Clubs.wp?frm=t&RF=Zp%2CST"))
 
     get_state_abbreviations(index).each { |state| scrape_state_page(state) }
 
     puts "\n\nSorry that took so long."
   end
 
+  # Form Data
+  # do I need cookies, etc now?
   def self.scrape_state_page(state)
     puts "Fetching gym data in #{state}..."
-    state_doc = Nokogiri::HTML(open("#{BASE_URL}/Clubs.wp?frm=t&CompanyState=#{state}"))
+    data = {
+      'wp_ClientOrgID' => '',
+      'CompanyParentID' => '',
+      'CompanyName' => '',
+      'CompanyState' => state,
+      'geo_Zip' => '',
+      'geo_Miles' => 25,
+      'submit' => 'Go'
+    }
 
-    # I want it to scrape each state page
-    # I want it to insantiate and save gym objects for each gym on the page
-    # This will just be basic info and I can set other data in the gym class
+    url = URI("#{BASE_URL}/Clubs.wp?frm=t&RF=Zp%2CST")
+    http = Net::HTTP.new(url.host, url.port)
+    http.use_ssl = true
+    request = Net::HTTP::Post.new(url)
+    request["Content-Type"] = 'application/x-www-form-urlencoded'
+    request["cache-control"] = 'no-cache'
+    request.body = "wp_ClientOrgID=&CompanyParentID=&CompanyName=&CompanyState=#{state}&geo_Zip=&geo_Miles=25&submit=Go"
+    response = http.request(request)
+    state_doc = Nokogiri::HTML(response.read_body)
 
-    state_doc.search("li").each do |gym_row|
-      # binding.pry
-      # if gym_row.search(".right+ .left").text.split(" ").size < 5
-      #   scrape_gym_page(gym_row)
-      # else
-        ClosestWeightliftingGem::Gym.new({
-             :name => gym_row.search("h3").text,
-           :street => gym_row.search("p").children[0].to_s,
-             :city => gym_row.search("p").children[2].to_s.split(/\W+/)[0],
-            :state => state,
-          :zipcode => gym_row.search("p").children[2].to_s.split(/\W+/)[-1],
-            :phone => gym_row.search("p").children[4].to_s,
-          :website => gym_row.search("a")[0].attr('href'),
-         :director => gym_row.search("p").children[10].to_s
-        })
-      # end
+    state_doc.search("#wp_Clubs li").each do |gym_row|
+      details = extract_details(gym_row.search("p")[0])
+
+      ClosestWeightliftingGem::Gym.new({
+           :name => gym_row.search("h3").text.strip,
+         :street => details[:street], #gym_row.search("p").children[0].to_s,
+           :city => details[:city], #gym_row.search("p").children[2].to_s.split(/\W+/)[0],
+          :state => state,
+        :zipcode => details[:zipcode], #gym_row.search("p").children[2].to_s.split(/\W+/)[-1],
+          :phone => details[:phone], #gym_row.search("p").children[4].to_s,
+        :website => details[:website],
+       :director => details[:director]
+      })
     end
   end
 
@@ -60,108 +75,52 @@ class ClosestWeightliftingGem::Scraper
       :usaw_url => gym_row.search("a").first.attr("onclick").match(/\/V.+true/)[0]
     })
   end
-# =======
-#     # binding.pry
-#
-#     state_doc.search("li").each do |gym_row|
-#       # Count the gym rows, then process them according to size
-#       size = gym_row.search("p").children.size
-#
-#       # count[size] +=1
-#
-#       case size
-#         when 1
-#           scrape_from_one(gym_row)
-#         when 5
-#           scrape_from_five(gym_row)
-#         when 7
-#           scrape_from_seven(gym_row)
-#         when 9
-#           scrape_from_nine_or_eleven(gym_row)
-#         when 11
-#           scrape_from_nine_or_eleven(gym_row)
-#         when 13
-#           scrape_from_thirteen(gym_row)
-#         else
-#           puts "Please NOOOOOO!!!"
-#           return
-#       end
-    # end
-  # end
 
-  def self.scrape_from_one(gym_row)
-    ClosestWeightliftingGem::Gym.new({
-      :name => gym_row.search("h3").text.strip,
-      :phone => gym_row.search("p").first.text
-    })
-  end
+  def self.extract_details(info_div)
+    details = {
+      "street": "",
+      "city": "",
+      "state": "",
+      "zipcode": "",
+      "phone": "",
+      "website": "",
+      "director": ""
+    }
 
-  def self.scrape_from_five(gym_row)
-    is_region = gym_row.search("h3").text.include?("5")
+    begin
+      aa = info_div.children.select { |el| !["br", "b"].include?(el.name) }
+      case aa.length
+      when 1
+        details[:phone] = aa[0].text
+      when 3
+        details[:phone] = aa[0].text
+        details[:director] = aa[1].text
+      when 4
+        details[:phone] = aa[0].text
+        details[:website] = aa[1].text
+        details[:director] = aa[2].text
+      else
+        if aa[1].text.include?(", ")
+          city, state_zip = aa[1].text.split(", ")
+        else
+          city, state_zip = aa[2].text.split(", ")
+        end
 
-    if is_region
-      scrape_from_seven(gym_row)
-    else
-      ClosestWeightliftingGem::Gym.new({
-          :name => gym_row.search("h3").text.strip,
-        :street => gym_row.search("p").children.first.text,
-          :city => gym_row.search("p").children[2].text.split(",").first,
-         :state => gym_row.search("p").children[2].text.split(/[\,\d]/).last[1..2],
-       :zipcode => gym_row.search("p").children[2].text.split(",")[1][-5..-1],
-         :phone => gym_row.search("p").children[4].text
-      })
+        state, empty, zip = state_zip.split(/[[:space:]]/)
+        details[:street] = aa[0].text
+        details[:city] = city
+        details[:state] = state
+        details[:zipcode] = zip
+        details[:phone] = aa[2].text
+        details[:website] = aa[3]["href"]
+        details[:director] = aa[4].text
+      end
+    rescue StandardError => e
+      puts "[ERROR] extracting details from: #{aa}"
+      puts "[ERROR] #{e}"
     end
-  end
 
-  def self.scrape_from_seven(gym_row)
-    ClosestWeightliftingGem::Gym.new({
-         :name => gym_row.search("h3").text.strip,
-        :phone => gym_row.search("p").children.first.text,
-     :director => gym_row.search("p").children[4].text
-    })
-  end
-
-  def self.scrape_from_nine_or_eleven(gym_row)
-    two_level_address = gym_row.search("p").children[2].text.include?(",")
-    is_jugg = gym_row.search("h3").text.downcase.include?("jugg")
-    is_shady = gym_row.search("h3").text.downcase.include?("shadyside barbell")
-
-    if two_level_address
-      ClosestWeightliftingGem::Gym.new({
-           :name => gym_row.search("h3").text.split("\t").last,
-         :street => gym_row.search("p").children.first.text,
-           :city => gym_row.search("p").children[2].text.split(",").first,
-          :state => gym_row.search("p").children[2].text.split(/[\,\d]/).last[1..2],
-        :zipcode => gym_row.search("p").children[2].text.split(",")[1][-5..-1],
-          :phone => gym_row.search("p").children[4].text,
-       :director => gym_row.search("p").children[8].text
-      })
-    elsif is_jugg || is_shady
-      ClosestWeightliftingGem::Gym.new({
-          :name => gym_row.search("h3").text.strip,
-        :street => gym_row.search("p").children.first.text.split(",").first.titleize,
-         :state => gym_row.search("p").children.first.text.split(/[\,\d]/).last[1..2],
-       :zipcode => gym_row.search("p").children.first.text[-5..-1],
-         :phone => gym_row.search("p").children[2].text,
-      :director => gym_row.search("p").children[6].text
-        })
-    else
-      scrape_from_thirteen(gym_row)
-    end
-  end
-
-  def self.scrape_from_thirteen(gym_row)
-    street_address = gym_row.search("p").children.first.text
-    suite = gym_row.search("p").children[2].text
-
-    ClosestWeightliftingGem::Gym.new({
-        :name => gym_row.search("h3").text.split("\t").last,
-      :street => "#{street_address}  #{suite}",
-        :city => gym_row.search("p").children[4].text.split(",").first,
-       :state => gym_row.search("p").children[4].text.split(/[\,\d]/).last[1..2],
-     :zipcode => gym_row.search("p").children[4].text.split(",")[1][-5..-1],
-       :phone => gym_row.search("p").children[6].text,
-    :director => gym_row.search("p").children[10].text
-    })
+    details.each { |k, v| details[k] = "" if v.nil? }
+    details
   end
 end
